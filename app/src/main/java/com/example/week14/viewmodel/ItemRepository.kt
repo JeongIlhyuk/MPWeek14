@@ -92,4 +92,19 @@ class ItemRepository(private val table: DatabaseReference) {
             emit(emptyList())
         }
     }
+
+    fun getDescItems(): Flow<List<ItemEntity>> = flow {
+
+        try {
+            val snapshot = table.orderByChild("itemName")
+                .get().await()
+            val itemList = snapshot.children.mapNotNull {
+                it.getValue(ItemEntity::class.java)
+            }
+            emit(itemList)
+        } catch (e: Exception) {
+            Log.e("조회", "실패")
+            emit(emptyList())
+        }
+    }
 }

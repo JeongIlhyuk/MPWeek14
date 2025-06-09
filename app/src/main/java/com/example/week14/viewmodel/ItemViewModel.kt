@@ -61,9 +61,13 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
     fun getDescItems() {
 //        viewModelScope.launch {
 //            repository.getAllItems().collect {
-////                _itemList.value = it.sortedByDescending { it.itemQuantity }
-//                _itemList.value = it
+//                _itemList.value = it.sortedByDescending { it.itemQuantity }
 //            }
 //        }
+        viewModelScope.launch {
+            repository.getDescItems().collect {
+                _itemList.value = it.sortedByDescending { it.itemQuantity }
+            }
+        }
     }
 }
