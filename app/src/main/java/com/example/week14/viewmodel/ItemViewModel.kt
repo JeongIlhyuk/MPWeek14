@@ -24,14 +24,6 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
         getAllItems()
     }
 
-    fun dscItems() {
-        viewModelScope.launch {
-            repository.getAllItems().collect {
-                _itemList.value = it.sortedByDescending { it.itemQuantity }
-            }
-        }
-    }
-
     fun getItems(itemName: String) {
         viewModelScope.launch {
             repository.getItems(itemName).collect {
@@ -51,21 +43,27 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
     fun InsertItem(itemEntity: ItemEntity) {
         viewModelScope.launch {
             repository.InsertItem(itemEntity)
-            getAllItems()
         }
     }
 
     fun UpdateItem(itemEntity: ItemEntity) {
         viewModelScope.launch {
             repository.UpdateItem(itemEntity)
-            getAllItems()
         }
     }
 
     fun DeleteItem(itemEntity: ItemEntity) {
         viewModelScope.launch {
             repository.DeleteItem(itemEntity)
-            getAllItems()
         }
+    }
+
+    fun getDescItems() {
+//        viewModelScope.launch {
+//            repository.getAllItems().collect {
+////                _itemList.value = it.sortedByDescending { it.itemQuantity }
+//                _itemList.value = it
+//            }
+//        }
     }
 }

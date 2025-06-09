@@ -94,13 +94,13 @@ fun InputScreen(viewModel: ItemViewModel, selectedItem: ItemEntity?) {
                 Text("delete")
             }
             Button(onClick = {
-                viewModel.getItems("$itemName%")
+                viewModel.getItems("$itemName")
                 clearText()
             }) {
                 Text("find")
             }
             Button(onClick = {
-                viewModel.dscItems()
+                viewModel.getDescItems()
                 clearText()
             }) {
                 Text("dsc")

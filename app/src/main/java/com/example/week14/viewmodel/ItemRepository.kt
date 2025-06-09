@@ -5,7 +5,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
 class ItemRepository(private val table: DatabaseReference) {
@@ -55,7 +58,7 @@ class ItemRepository(private val table: DatabaseReference) {
         }
     }
 
-    fun getAllItems(): Flow<List<ItemEntity>> {
+    fun getAllItems(): Flow<List<ItemEntity>> = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val itemList = snapshot.children.mapNotNull {
@@ -65,12 +68,28 @@ class ItemRepository(private val table: DatabaseReference) {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                close(error.toException())
             }
+        }
+        table.addValueEventListener(listener)
+        awaitClose {
+            table.removeEventListener(listener)
         }
     }
 
-//    fun getAllItems() = dao.getAllItems()
-//
-//    fun getItems(itemName: String) = dao.getItems(itemName)
+    fun getItems(itemName: String): Flow<List<ItemEntity>> = flow {
+
+        try {
+            val snapshot = table.orderByChild("itemName").startAt(itemName)
+                .endAt(itemName + "\uf8ff")
+                .get().await()
+            val itemList = snapshot.children.mapNotNull {
+                it.getValue(ItemEntity::class.java)
+            }
+            emit(itemList)
+        } catch (e: Exception) {
+            Log.e("조회", "실패")
+            emit(emptyList())
+        }
+    }
 }

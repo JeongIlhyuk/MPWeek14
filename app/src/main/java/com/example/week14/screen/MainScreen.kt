@@ -10,25 +10,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.week14.roomDB.ItemDatabase
 import com.example.week14.viewmodel.ItemEntity
 import com.example.week14.viewmodel.ItemRepository
 import com.example.week14.viewmodel.ItemViewModel
 import com.example.week14.viewmodel.ItemViewModelFactory
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val itemdb = ItemDatabase.getDBInstance(context)
+    val table = Firebase.database.getReference("Products/items")
     val itemViewModel: ItemViewModel =
-        viewModel(factory = ItemViewModelFactory(ItemRepository(itemdb)))
+        viewModel(factory = ItemViewModelFactory(ItemRepository(table)))
     val itemListState by itemViewModel.itemList.collectAsState(initial = emptyList())
 
     var selectedItem by remember {
         mutableStateOf<ItemEntity?>(null)
     }
-
     val selectedAction = { itemEntity: ItemEntity -> selectedItem = itemEntity }
+
+//    var selectedItemEntity by remember{mutableStateOf<ItemEntity?>(null)}
+//    val selectedEvent = {itemEntity: ItemEntity -> selectedItemEntity = itemEntity }
 
     Column {
         InputScreen(viewModel = itemViewModel, selectedItem)
